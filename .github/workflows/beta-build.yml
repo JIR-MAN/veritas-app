@@ -1,0 +1,37 @@
+# Builds installable beta apps with EAS after the checks pass.
+# Needs a repository secret EXPO_TOKEN (see docs/BETA_SETUP.md). Runs only when started by hand.
+name: Beta build
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'android, ios or all'
+        default: android
+        required: true
+
+jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+  build:
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Check for Expo token
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then echo "::error::Add the EXPO_TOKEN repository secret first (docs/BETA_SETUP.md)"; exit 1; fi
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      - name: Link EAS project
+        run: eas init --non-interactive --force
+      - name: Build
+        run: eas build --profile preview --platform ${{ github.event.inputs.platform }} --non-interactive --no-wait

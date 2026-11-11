@@ -1,56 +1,36 @@
-# Welcome to your Expo app 👋
+# VERITAS (beta)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+VERITAS is an app for iPhone, iPad and Android that helps people deal with suspicious media, impersonation, scams and online abuse. It works in four steps: **Check**, **Protect**, **Act** and **Learn**. *VERITAS is a working name until it has been cleared for use.*
 
-## Get started
+> **Status:** milestone 1 of the beta, not yet released. See [docs/STATUS.md](docs/STATUS.md) for what works today.
 
-1. Install dependencies
+## What works now (milestone 1)
 
-   ```bash
-   npm install
-   ```
+| | |
+|---|---|
+| **Check** | Reads Content Credentials (C2PA) **on the device** using the official CAI library. It shows each check separately: the signature, whether the file changed after signing, whether the signer is recognised, and the declared origin. AI watermark and AI detector checks always show as *not checked*, because none is connected. |
+| **Protect** | Saves a file as evidence. This calculates its SHA-256 fingerprint on the device, records the time and time zone and the link you found it at, and keeps a private copy. Cases hold your timeline notes, with approximate times marked as such. |
+| **Export** | Creates a PDF report and a JSON data file on the device. VERITAS never sends them anywhere. |
+| **Demo path** | Four bundled sample files, so reviewers can try a real check without using personal files. |
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Developer quick start
 
 ```bash
-npm run reset-project
+npm install          # also builds the on-device engine (assets/engine/)
+npx expo start       # dev server (the engine needs a development build, not Expo Go)
+npm test             # unit tests
+npm run lint && npm run typecheck
+node e2e/engine.e2e.cjs      # real C2PA engine against fixtures (Chromium)
+npm run test:journey         # full Check → Protect → Export journey on the web build
+npm run screenshots          # phone and tablet screenshots in artifacts/screens
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+## How it is built
 
-### Other setup steps
+- **App:** Expo SDK 58 / React Native 0.88 / TypeScript / Expo Router (`src/app`).
+- **Phones and tablets:** phones get bottom tabs. Tablets get a navigation rail in portrait and a sidebar in landscape, with list-and-detail views (`src/components/AdaptiveTabBar.tsx`, `src/app/(tabs)/cases.tsx`).
+- **Credentials engine** (`engine/engine.ts`): `@contentauth/c2pa-web` (c2pa-rs compiled to WebAssembly) runs in a hidden WebView on native and in an iframe on web. Files are streamed in as bytes. Remote manifests and OCSP are not fetched, and the CSP blocks network access. The trust lists are bundled in `assets/trust/` (see `SOURCES.json`).
+- **Result wording** (`src/features/check/classify.ts`): one pure function that turns the engine output into what users see. It is tested against real c2pa-rs output (`fixtures/reports`).
+- **Storage:** SQLite key-value storage in the app sandbox, plus private file copies in the app's documents folder. There are no accounts, no cloud storage and no analytics.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+More detail: [Architecture and decisions](docs/ARCHITECTURE.md) · [Screens](docs/SCREENS.md) · [Integrations register](docs/INTEGRATIONS.md) · [Risks and limitations](docs/RISKS.md) · [Beta setup](docs/BETA_SETUP.md)

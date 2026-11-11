@@ -1,0 +1,38 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Lint
+        run: npx eslint .
+      - name: Unit tests
+        run: npx jest --ci
+      - name: Install Chromium for end-to-end tests
+        run: npx playwright install --with-deps chromium
+      - name: Engine regression test (real C2PA library)
+        run: node e2e/engine.e2e.cjs
+      - name: Build web
+        run: npx expo export -p web --output-dir dist
+      - name: Full journey test
+        run: node e2e/journey.e2e.cjs
+      - name: Screenshots (phone and tablet, light and dark)
+        run: node e2e/screenshots.cjs 2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: artifacts/screens

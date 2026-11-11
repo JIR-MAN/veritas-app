@@ -1,11 +1,12 @@
 {
   "name": "veritas",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "expo-router/entry",
   "dependencies": {
     "@expo/ui": "~58.0.28",
     "@expo/vector-icons": "^15.1.1",
     "expo": "~58.0.24",
+    "expo-asset": "~58.0.21",
     "expo-constants": "~58.0.16",
     "expo-crypto": "~58.0.8",
     "expo-device": "~58.0.5",
@@ -40,10 +41,14 @@
     "@contentauth/c2pa-node": "^0.10.1",
     "@contentauth/c2pa-web": "^0.16.1",
     "@types/jest": "^30.0.0",
+    "@types/node": "^22.20.5",
     "@types/react": "~19.3.0",
     "esbuild": "^0.28.2",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~58.0.0",
     "jest": "^30.5.2",
     "jest-expo": "~58.0.14",
+    "playwright": "^1.63.0",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -52,13 +57,15 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint",
+    "lint": "eslint .",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "engine:build": "node scripts/build-engine.mjs && node scripts/build-engine.mjs --test",
     "fixtures": "node scripts/make-fixtures.mjs && node scripts/capture-reports.cjs",
     "test:engine": "node e2e/engine.e2e.cjs",
-    "postinstall": "node scripts/build-engine.mjs && node scripts/build-engine.mjs --test"
+    "postinstall": "node scripts/build-engine.mjs && node scripts/build-engine.mjs --test",
+    "test:journey": "expo export -p web --output-dir dist && node e2e/journey.e2e.cjs",
+    "screenshots": "node e2e/screenshots.cjs 2"
   },
   "private": true,
   "jest": {
