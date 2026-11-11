@@ -6,5 +6,5 @@ const globals = require('globals');
 module.exports = defineConfig([
   expoConfig,
   { files: ['**/*.cjs', '**/*.mjs', 'scripts/**', 'e2e/**', '*.config.js'], languageOptions: { globals: globals.node } },
-  { ignores: ['dist/*', 'dist-pages/*', 'assets/engine/*', 'fixtures/*', 'artifacts/*'] },
+  { ignores: ['dist/*', 'dist-pages/*', 'assets/engine/*', 'fixtures/*', 'artifacts/*', 'engine/vendor/*'] },
 ]);

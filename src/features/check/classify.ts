@@ -20,8 +20,18 @@ export type EngineInfo = {
 
 type StatusEntry = { code: string; url?: string; explanation?: string };
 
+export type MetaFinding = { kind: 'ai_declared' | 'generator' | 'generation_settings'; source: string; value: string };
+export type MetadataReport = {
+  findings: MetaFinding[];
+  fields: { label: string; value: string }[];
+  hasLocation: boolean;
+  hasCamera: boolean;
+  hasAnyMetadata: boolean;
+};
+
 export type EngineReport = {
   hasManifest: boolean;
+  metadata?: MetadataReport | null;
   remoteManifestUrl?: string;
   activeLabel?: string | null;
   store?: {
@@ -47,7 +57,7 @@ type RawManifest = {
 
 export type EngineResponse =
   | { type: 'result'; id: string; report: EngineReport }
-  | { type: 'error'; id: string; code: string; message: string };
+  | { type: 'error'; id: string; code: string; message: string; metadata?: MetadataReport | null };
 
 export type Verdict =
   | 'ai_declared'
@@ -57,6 +67,7 @@ export type Verdict =
   | 'credentials_invalid'
   | 'remote_not_checked'
   | 'no_credentials'
+  | 'ai_metadata'
   | 'unsupported'
   | 'too_large'
   | 'failed';
@@ -64,7 +75,7 @@ export type Verdict =
 export type Tone = 'neutral' | 'info' | 'caution' | 'critical';
 
 export type CheckLine = {
-  id: 'credentials' | 'signature' | 'integrity' | 'signer' | 'origin' | 'watermark' | 'detector';
+  id: 'credentials' | 'signature' | 'integrity' | 'signer' | 'origin' | 'metadata' | 'watermark' | 'detector';
   label: string;
   state: 'pass' | 'fail' | 'warn' | 'info' | 'not_run' | 'unavailable';
   detail: string;
@@ -87,6 +98,7 @@ export type Classification = {
   limitations: string[];
   failureCodes: string[];
   engine: EngineInfo | null;
+  metadata: MetadataReport | null;
 };
 
 const AI_TYPES = new Set(['trainedAlgorithmicMedia', 'algorithmicMedia', 'algorithmicallyEnhanced']);
@@ -140,15 +152,15 @@ const ORIGIN_LABEL: Record<Exclude<Origin, null>, string> = {
 const NOT_RUN_EXTRAS: CheckLine[] = [
   {
     id: 'watermark',
-    label: 'AI watermark',
+    label: 'Invisible watermark',
     state: 'unavailable',
-    detail: 'Not checked. No authorised watermark service is connected.',
+    detail: 'Not checked yet. Use “Invisible watermark” below to read Adobe’s TrustMark on this device, or “Search the web and SynthID” for Google’s watermark.',
   },
   {
     id: 'detector',
     label: 'AI forensic detector',
     state: 'unavailable',
-    detail: 'Not checked. No independently evaluated detector is connected.',
+    detail: 'Not checked. Paid detection services are switched off until approved.',
   },
 ];
 
@@ -190,10 +202,52 @@ function empty(verdict: Verdict, tone: Tone, headline: string, summary: string, 
     limitations,
     failureCodes: [],
     engine,
+    metadata: null,
   };
 }
 
+export function describeFindings(m: MetadataReport): string {
+  const parts: string[] = [];
+  const declared = m.findings.find((f) => f.kind === 'ai_declared');
+  if (declared) parts.push('labelled as AI-generated');
+  const gens = m.findings.filter((f) => f.kind === 'generator').map((f) => f.value);
+  if (gens.length) parts.push(`mentions ${gens.join(', ')}`);
+  if (m.findings.some((f) => f.kind === 'generation_settings')) parts.push('contains AI image-generation settings');
+  return parts.join('; ');
+}
+
+function metadataLine(m: MetadataReport | null | undefined): CheckLine {
+  if (!m) return { id: 'metadata', label: 'Hidden file details', state: 'not_run', detail: 'Could not be read.' };
+  if (m.findings.length) return { id: 'metadata', label: 'Hidden file details', state: 'warn', detail: `The file’s details ${describeFindings(m)}. Labels like this are easy to add or remove.` };
+  if (!m.hasAnyMetadata) return { id: 'metadata', label: 'Hidden file details', state: 'info', detail: 'None found. Many apps and websites remove them.' };
+  return { id: 'metadata', label: 'Hidden file details', state: 'info', detail: m.hasCamera ? 'No AI labels. Camera details are present, but they can be edited.' : 'No AI labels found.' };
+}
+
+/** Adds the metadata check, and lets an AI label lead the result when nothing stronger is known. */
+function withMetadata(c: Classification, m: MetadataReport | null | undefined): Classification {
+  const line = metadataLine(m);
+  const i = c.checks.findIndex((x) => x.id === 'watermark');
+  const checks = [...c.checks.slice(0, i), line, ...c.checks.slice(i)];
+  const out = { ...c, checks, metadata: m ?? null };
+  if (m?.findings.length && (c.verdict === 'no_credentials' || c.verdict === 'remote_not_checked')) {
+    return {
+      ...out,
+      verdict: 'ai_metadata',
+      tone: 'caution',
+      headline: 'AI label in file details',
+      summary: `This file’s hidden details ${describeFindings(m)}. That is a strong clue, but such labels can be added or removed by anyone, so it isn’t proof.`,
+    };
+  }
+  return out;
+}
+
 export function classify(res: EngineResponse): Classification {
+  const m = res.type === 'result' ? res.report.metadata : res.metadata;
+  const base = classifyCredentials(res);
+  return res.type === 'error' && !m ? base : withMetadata(base, m);
+}
+
+function classifyCredentials(res: EngineResponse): Classification {
   if (res.type === 'error') {
     if (res.code === 'unsupported') {
       return empty(
@@ -324,6 +378,7 @@ export function classify(res: EngineResponse): Classification {
     checks,
     failureCodes,
     engine: report.engine,
+    metadata: null,
   };
 
   if (invalid) {

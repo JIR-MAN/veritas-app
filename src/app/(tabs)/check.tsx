@@ -26,8 +26,10 @@ export default function Check() {
         subtitle="Signed records of how a file was made"
         value={status === 'ready' ? 'On device' : status === 'loading' ? 'Starting…' : 'Unavailable'}
       />
-      <Row icon="droplet" title="AI watermarks" subtitle="Needs an authorised provider" value="Not connected" />
-      <Row icon="cpu" title="AI forensic detector" subtitle="Needs an independently evaluated service" value="Not connected" />
+      <Row icon="file-text" iconColor="success" title="AI labels in file details" subtitle="EXIF, XMP and PNG text" value="On device" />
+      <Row icon="droplet" iconColor="success" title="Invisible watermark (TrustMark)" subtitle="One-time free download, then offline" value="On device" />
+      <Row icon="globe" title="Google SynthID, web search" subtitle="Opens Google or others only if you choose" value="Your choice" />
+      <Row icon="cpu" title="Paid AI detection services" subtitle="Switched off until approved" value="Not connected" />
     </Group>
   );
 

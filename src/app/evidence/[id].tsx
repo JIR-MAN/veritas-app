@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { useState } from 'react';
 import { Platform, TextInput, View } from 'react-native';
-import { ChecksGroup, DetailsGroup, LimitationsGroup, ResultBanner } from '@/components/ResultSections';
+import { ChecksGroup, DetailsGroup, LimitationsGroup, MetadataGroup, MoreChecksGroup, ResultBanner } from '@/components/ResultSections';
 import { confirm, notify } from '@/components/confirm';
 import { cases, useData } from '@/features/cases/store';
 import { deleteStored, fileExists } from '@/features/evidence/fileio';
@@ -75,6 +75,8 @@ export default function EvidenceScreen() {
       <ResultBanner r={e.check} />
       <ChecksGroup r={e.check} />
       <DetailsGroup r={e.check} />
+      <MetadataGroup r={e.check} />
+      {hasCopy ? <MoreChecksGroup target={{ evidence: e.id }} /> : null}
       <LimitationsGroup r={e.check} />
     </>
   ) : (

@@ -1,9 +1,25 @@
 {
  "type": "result",
- "id": "job11",
+ "id": "job14",
  "report": {
   "hasManifest": false,
   "remoteManifestUrl": "https://cai-manifests.adobe.com/manifests/adobe-urn-uuid-5f37e182-3687-462e-a7fb-573462780391",
+  "metadata": {
+   "findings": [],
+   "fields": [
+    {
+     "label": "Software",
+     "value": "Adobe Photoshop 21.1 (Macintosh)"
+    },
+    {
+     "label": "Created with",
+     "value": "Adobe Photoshop 21.1 (Macintosh)"
+    }
+   ],
+   "hasLocation": false,
+   "hasCamera": false,
+   "hasAnyMetadata": true
+  },
   "engine": {
    "library": "@contentauth/c2pa-web",
    "libraryVersion": "0.16.1",

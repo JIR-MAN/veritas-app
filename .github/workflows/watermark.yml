@@ -1,0 +1,30 @@
+name: TrustMark reader
+# Downloads Adobe's real TrustMark models and sample images (not reachable from
+# every development sandbox) and checks that the on-device reader decodes them.
+on:
+  push:
+    branches: [main]
+    paths: ['engine/**', 'src/features/watermark/**', 'src/app/inspect/watermark.tsx', 'e2e/watermark.e2e.cjs', 'scripts/build-engine.mjs', 'package-lock.json', '.github/workflows/watermark.yml']
+  workflow_dispatch:
+
+jobs:
+  trustmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx expo export -p web --output-dir dist
+      - name: Decode Adobe's samples, then the in-app flow
+        run: node e2e/watermark.e2e.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trustmark
+          path: artifacts/screens/watermark-web.png
+          if-no-files-found: ignore

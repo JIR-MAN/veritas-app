@@ -18,12 +18,15 @@ import interimAnchors from '../assets/trust/cai-interim-anchors.pem';
 import interimAllowed from '../assets/trust/cai-interim-allowed.pem';
 import interimStore from '../assets/trust/cai-interim-store.cfg';
 import pkg from '@contentauth/c2pa-web/package.json';
+import { analyzeMetadata } from './metadata';
+import { errorLevelAnalysis } from './ela';
 
 declare const __TRUST_LISTS_FETCHED__: string;
 declare const __EXTRA_USER_ANCHORS__: string;
 
+type Op = 'verify' | 'ela';
 type Inbound =
-  | { type: 'begin'; id: string; mime: string; size: number }
+  | { type: 'begin'; id: string; mime: string; size: number; op?: Op }
   | { type: 'chunk'; id: string; b64: string }
   | { type: 'end'; id: string };
 
@@ -73,7 +76,7 @@ function getC2pa() {
 }
 
 const MAX_BYTES = 200 * 1024 * 1024;
-const pending = new Map<string, { mime: string; size: number; parts: Uint8Array[]; received: number }>();
+const pending = new Map<string, { mime: string; size: number; parts: Uint8Array[]; received: number; op: Op }>();
 
 function b64ToBytes(b64: string) {
   const bin = atob(b64);
@@ -89,9 +92,29 @@ async function verify(id: string) {
   if (job.received !== job.size)
     return send({ type: 'error', id, code: 'incomplete', message: `Received ${job.received} of ${job.size} bytes.` });
   const started = Date.now();
+  const blob = new Blob(job.parts as BlobPart[], { type: job.mime });
+  if (job.op === 'ela') {
+    try {
+      const ela = await errorLevelAnalysis(blob);
+      return send({ type: 'ela', id, ela });
+    } catch (e: any) {
+      return send({ type: 'error', id, code: 'ela_failed', message: String(e?.message ?? e) });
+    }
+  }
+  let metadata: Awaited<ReturnType<typeof analyzeMetadata>> | null = null;
+  try {
+    const all = new Uint8Array(job.size);
+    let o = 0;
+    for (const p of job.parts) {
+      all.set(p, o);
+      o += p.length;
+    }
+    metadata = await analyzeMetadata(all);
+  } catch {
+    metadata = null;
+  }
   try {
     const c2pa = await getC2pa();
-    const blob = new Blob(job.parts as BlobPart[], { type: job.mime });
     let reader: Awaited<ReturnType<typeof Reader.fromBlob>> = null;
     try {
       reader = await Reader.fromBlob(c2pa, job.mime, blob, context!);
@@ -101,24 +124,24 @@ async function verify(id: string) {
       // automatically: that would tell a third party which file is being checked.
       const remote = /RemoteManifestUrl\("([^"]+)"\)/.exec(message);
       if (remote) {
-        return send({ type: 'result', id, report: { hasManifest: false, remoteManifestUrl: remote[1], engine: info, ms: Date.now() - started } });
+        return send({ type: 'result', id, report: { hasManifest: false, remoteManifestUrl: remote[1], metadata, engine: info, ms: Date.now() - started } });
       }
       // c2pa-rs reports "no manifest found" as an error for some formats.
       if (/JumbfNotFound|ManifestNotFound|no.*manifest|not found/i.test(message)) {
-        return send({ type: 'result', id, report: { hasManifest: false, engine: info, ms: Date.now() - started } });
+        return send({ type: 'result', id, report: { hasManifest: false, metadata, engine: info, ms: Date.now() - started } });
       }
       if (/UnsupportedType|unsupported/i.test(message)) {
-        return send({ type: 'error', id, code: 'unsupported', message });
+        return send({ type: 'error', id, code: 'unsupported', message, metadata });
       }
       return send({ type: 'error', id, code: 'read_failed', message });
     }
     if (!reader) {
-      return send({ type: 'result', id, report: { hasManifest: false, engine: info, ms: Date.now() - started } });
+      return send({ type: 'result', id, report: { hasManifest: false, metadata, engine: info, ms: Date.now() - started } });
     }
     const store = await reader.manifestStore();
     const activeLabel = await reader.activeLabel();
     await reader.free();
-    send({ type: 'result', id, report: { hasManifest: true, activeLabel, store, engine: info, ms: Date.now() - started } });
+    send({ type: 'result', id, report: { hasManifest: true, activeLabel, store, metadata, engine: info, ms: Date.now() - started } });
   } catch (e: any) {
     send({ type: 'error', id, code: 'engine_failed', message: String(e?.message ?? e) });
   }
@@ -133,7 +156,7 @@ function receive(raw: string | Inbound) {
   }
   if (msg.type === 'begin') {
     if (msg.size > MAX_BYTES) return send({ type: 'error', id: msg.id, code: 'too_large', message: 'File too large.' });
-    pending.set(msg.id, { mime: msg.mime, size: msg.size, parts: [], received: 0 });
+    pending.set(msg.id, { mime: msg.mime, size: msg.size, parts: [], received: 0, op: msg.op ?? 'verify' });
   } else if (msg.type === 'chunk') {
     const job = pending.get(msg.id);
     if (!job) return;

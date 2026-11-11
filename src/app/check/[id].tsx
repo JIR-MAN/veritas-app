@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, TextInput, View } from 'react-native';
-import { ChecksGroup, DetailsGroup, LimitationsGroup, ResultBanner, VerifyTips } from '@/components/ResultSections';
+import { ChecksGroup, DetailsGroup, LimitationsGroup, MetadataGroup, MoreChecksGroup, ResultBanner, VerifyTips } from '@/components/ResultSections';
 import { notify } from '@/components/confirm';
 import { ISSUE_LABELS } from '@/features/cases/model';
 import { cases, useData } from '@/features/cases/store';
@@ -120,6 +120,8 @@ export default function CheckResult() {
           <View style={{ flex: 6 }}>
             <ChecksGroup r={r} />
             <DetailsGroup r={r} />
+            <MetadataGroup r={r} />
+            <MoreChecksGroup target={{ check: s.id }} />
             <LimitationsGroup r={r} />
             <VerifyTips />
           </View>
@@ -133,6 +135,8 @@ export default function CheckResult() {
       <ResultBanner r={r} />
       <ChecksGroup r={r} />
       <DetailsGroup r={r} />
+      <MetadataGroup r={r} />
+      <MoreChecksGroup target={{ check: s.id }} />
       {fileGroup}
       {choosing ? saveBlock : null}
       <LimitationsGroup r={r} />

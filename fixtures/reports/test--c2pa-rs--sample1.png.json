@@ -1,8 +1,32 @@
 {
  "type": "result",
- "id": "job16",
+ "id": "job19",
  "report": {
   "hasManifest": false,
+  "metadata": {
+   "findings": [],
+   "fields": [
+    {
+     "label": "Camera",
+     "value": "Canon EOS REBEL T3"
+    },
+    {
+     "label": "Lens",
+     "value": "EF-S18-55mm f/3.5-5.6 IS II"
+    },
+    {
+     "label": "Date taken (as written in the file)",
+     "value": "2011:07:30 15:41:25"
+    },
+    {
+     "label": "Software",
+     "value": "Adobe Lightroom 5.3 (Macintosh)"
+    }
+   ],
+   "hasLocation": false,
+   "hasCamera": true,
+   "hasAnyMetadata": true
+  },
   "engine": {
    "library": "@contentauth/c2pa-web",
    "libraryVersion": "0.16.1",

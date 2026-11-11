@@ -1,0 +1,31 @@
+{
+ "type": "result",
+ "id": "job3",
+ "report": {
+  "hasManifest": false,
+  "metadata": {
+   "findings": [
+    {
+     "kind": "generation_settings",
+     "source": "PNG text \"parameters\"",
+     "value": "Image-generation settings (such as a prompt or seed) are stored in the file"
+    }
+   ],
+   "fields": [],
+   "hasLocation": false,
+   "hasCamera": false,
+   "hasAnyMetadata": true
+  },
+  "engine": {
+   "library": "@contentauth/c2pa-web",
+   "libraryVersion": "0.16.1",
+   "trustListsFetched": "2026-11-11",
+   "trustLists": [
+    "C2PA Conformance Trust List",
+    "C2PA TSA Trust List",
+    "CAI interim trust list (legacy)"
+   ],
+   "testAnchorsLoaded": true
+  }
+ }
+}

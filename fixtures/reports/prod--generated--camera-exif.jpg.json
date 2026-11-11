@@ -1,0 +1,38 @@
+{
+ "type": "result",
+ "id": "job6",
+ "report": {
+  "hasManifest": false,
+  "metadata": {
+   "findings": [],
+   "fields": [
+    {
+     "label": "Camera",
+     "value": "Canon EOS R6"
+    },
+    {
+     "label": "Software",
+     "value": "Firmware 1.8.1"
+    },
+    {
+     "label": "Location",
+     "value": "Location data is present (coordinates not shown)"
+    }
+   ],
+   "hasLocation": true,
+   "hasCamera": true,
+   "hasAnyMetadata": true
+  },
+  "engine": {
+   "library": "@contentauth/c2pa-web",
+   "libraryVersion": "0.16.1",
+   "trustListsFetched": "2026-11-11",
+   "trustLists": [
+    "C2PA Conformance Trust List",
+    "C2PA TSA Trust List",
+    "CAI interim trust list (legacy)"
+   ],
+   "testAnchorsLoaded": false
+  }
+ }
+}

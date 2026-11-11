@@ -1,4 +1,4 @@
-# Screen inventory (milestone 1)
+# Screen inventory
 
 | Screen | Route | Phone | Tablet |
 |---|---|---|---|
@@ -10,6 +10,10 @@
 | New case | `/case/new` (modal) | Name + what happened | Same |
 | Add to timeline | `/case/[id]/note` (modal) | Text, date, time, approximate | Same |
 | Evidence record | `/evidence/[id]` | Fingerprint, result, source, file actions | Two panes |
+| Invisible watermark | `/inspect/watermark` | One-time reader download, then on-device TrustMark result | Same |
+| Search the web and SynthID | `/inspect/search` | SynthID portal, reverse image search, share to an app | Same |
+| Error levels | `/inspect/ela` | Warning, analysis image, how to read it | Same |
+| AI detection services | `/inspect/detectors` | Each paid service with cost; send only when switched on | Same |
 | Settings | `/settings` | Appearance, privacy, delete all, versions | Same |
 | How checks work | `/about/checks` | | |
 | Privacy | `/about/privacy` | | |

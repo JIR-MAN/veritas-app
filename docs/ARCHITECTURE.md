@@ -6,3 +6,4 @@
 4. **One classifier owns the wording.** `classify.ts` is the only place that turns engine output into user-facing claims. It is tested against real engine output.
 5. **Local-first storage.** No backend in milestone 1. Cases are JSON in SQLite KV storage, and files are copied into the sandbox.
 6. **Tests use real artifacts.** Fixtures come from c2pa-rs, or are generated and signed with its public test certificate (`scripts/make-fixtures.mjs`). Engine output is captured from the real library (`scripts/capture-reports.cjs`).
+7. **Every extra check is opt-in or on device.** Metadata and error levels run in the same engine page. TrustMark runs in a second hidden page (ONNX models in WebAssembly), loaded only when the user opens it. Web services (reverse search, SynthID, paid detectors) only run after the user confirms, and paid detectors go through a relay so API keys are never in the app.

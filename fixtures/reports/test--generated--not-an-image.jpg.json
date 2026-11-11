@@ -1,6 +1,13 @@
 {
  "type": "error",
- "id": "job5",
+ "id": "job8",
  "code": "unsupported",
- "message": "C2pa(UnsupportedType)"
+ "message": "C2pa(UnsupportedType)",
+ "metadata": {
+  "findings": [],
+  "fields": [],
+  "hasLocation": false,
+  "hasCamera": false,
+  "hasAnyMetadata": false
+ }
 }

@@ -1,0 +1,41 @@
+{
+ "type": "result",
+ "id": "job4",
+ "report": {
+  "hasManifest": false,
+  "metadata": {
+   "findings": [
+    {
+     "kind": "ai_declared",
+     "source": "XMP DigitalSourceType",
+     "value": "trainedAlgorithmicMedia"
+    },
+    {
+     "kind": "generator",
+     "source": "XMP metadata",
+     "value": "Adobe Firefly"
+    }
+   ],
+   "fields": [
+    {
+     "label": "Created with",
+     "value": "Adobe Firefly"
+    }
+   ],
+   "hasLocation": false,
+   "hasCamera": false,
+   "hasAnyMetadata": true
+  },
+  "engine": {
+   "library": "@contentauth/c2pa-web",
+   "libraryVersion": "0.16.1",
+   "trustListsFetched": "2026-11-11",
+   "trustLists": [
+    "C2PA Conformance Trust List",
+    "C2PA TSA Trust List",
+    "CAI interim trust list (legacy)"
+   ],
+   "testAnchorsLoaded": false
+  }
+ }
+}

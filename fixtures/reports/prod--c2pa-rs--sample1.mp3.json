@@ -1,8 +1,15 @@
 {
  "type": "result",
- "id": "job15",
+ "id": "job18",
  "report": {
   "hasManifest": false,
+  "metadata": {
+   "findings": [],
+   "fields": [],
+   "hasLocation": false,
+   "hasCamera": false,
+   "hasAnyMetadata": false
+  },
   "engine": {
    "library": "@contentauth/c2pa-web",
    "libraryVersion": "0.16.1",

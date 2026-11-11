@@ -1,6 +1,6 @@
 {
  "type": "result",
- "id": "job6",
+ "id": "job9",
  "report": {
   "hasManifest": true,
   "activeLabel": "contentauth:urn:uuid:b2b1f7fa-b119-4de1-9c0d-c97fbea3f2c3",
@@ -142,6 +142,13 @@
     "specVersion": "2.4.0"
    },
    "validation_state": "Valid"
+  },
+  "metadata": {
+   "findings": [],
+   "fields": [],
+   "hasLocation": false,
+   "hasCamera": false,
+   "hasAnyMetadata": false
   },
   "engine": {
    "library": "@contentauth/c2pa-web",

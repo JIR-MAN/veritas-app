@@ -30,6 +30,33 @@ export function DetailsGroup({ r }: { r: Classification }) {
   return <Group title="What the credentials say">{rows}</Group>;
 }
 
+export function MetadataGroup({ r }: { r: Classification }) {
+  const m = r.metadata;
+  if (!m || (!m.findings.length && !m.fields.length)) return null;
+  return (
+    <Group title="What the file details say" footer="File details can be edited by anyone. Treat them as clues.">
+      {m.findings.map((f, i) => (
+        <Field key={`f${i}`} label={f.source} value={f.kind === 'ai_declared' ? `AI-generated (${f.value})` : f.kind === 'generator' ? `Mentions ${f.value}` : f.value} />
+      ))}
+      {m.fields.map((f, i) => (
+        <Field key={`d${i}`} label={f.label} value={f.value} />
+      ))}
+    </Group>
+  );
+}
+
+/** Other ways to check, each started only by the user. */
+export function MoreChecksGroup({ target }: { target: { check?: string; evidence?: string } }) {
+  return (
+    <Group title="More ways to check" footer="Nothing leaves this device unless you choose a web service and confirm.">
+      <Row icon="globe" title="Search the web and SynthID" subtitle="Find earlier copies, or check Google’s AI watermark" onPress={() => router.push({ pathname: '/inspect/search', params: target })} testID="more-search" />
+      <Row icon="droplet" title="Invisible watermark" subtitle="Read Adobe’s TrustMark on this device (free)" onPress={() => router.push({ pathname: '/inspect/watermark', params: target })} testID="more-watermark" />
+      <Row icon="layers" title="Error levels" subtitle="An advanced visual aid on this device" onPress={() => router.push({ pathname: '/inspect/ela', params: target })} testID="more-ela" />
+      <Row icon="cpu" title="AI detection services" subtitle="Paid services: see what’s available" onPress={() => router.push({ pathname: '/inspect/detectors', params: target })} testID="more-detectors" />
+    </Group>
+  );
+}
+
 export function LimitationsGroup({ r }: { r: Classification }) {
   return (
     <Group title="Keep in mind">

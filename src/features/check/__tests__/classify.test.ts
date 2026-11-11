@@ -97,3 +97,38 @@ describe('honesty rules', () => {
     expect(classify({ type: 'error', id: 'x', code: 'too_large', message: '' }).verdict).toBe('too_large');
   });
 });
+
+describe('hidden file details (metadata)', () => {
+  test('XMP AI label leads the result when there are no credentials, but is called a clue, not proof', () => {
+    const c = classify(load('prod--generated--ai-metadata-xmp.jpg'));
+    expect(c.verdict).toBe('ai_metadata');
+    expect(c.summary).toMatch(/labelled as AI-generated/);
+    expect(c.summary).toMatch(/Adobe Firefly/);
+    expect(c.summary).toMatch(/isn’t proof/);
+    expect(c.checks.find((x) => x.id === 'metadata')?.state).toBe('warn');
+  });
+
+  test('Stable Diffusion settings in a PNG are found', () => {
+    const c = classify(load('prod--generated--ai-metadata-sd.png'));
+    expect(c.verdict).toBe('ai_metadata');
+    expect(c.summary).toMatch(/image-generation settings/);
+  });
+
+  test('camera details are never treated as proof of being real', () => {
+    const c = classify(load('prod--generated--camera-exif.jpg'));
+    expect(c.verdict).toBe('no_credentials');
+    expect(c.checks.find((x) => x.id === 'metadata')?.detail).toMatch(/can be edited/);
+    expect(c.metadata?.hasLocation).toBe(true);
+    expect(JSON.stringify(c.metadata)).not.toMatch(/5\.5|0\.21|33/); // no coordinates exposed
+  });
+
+  test('ordinary editing software is not flagged', () => {
+    const c = classify(load('prod--generated--no-credentials.jpg'));
+    expect(c.metadata?.findings).toEqual([]);
+    expect(c.verdict).toBe('no_credentials');
+  });
+
+  test('credentials failures still outrank metadata', () => {
+    expect(classify(load('prod--generated--ai-declared-tampered.jpg')).verdict).toBe('credentials_invalid');
+  });
+});

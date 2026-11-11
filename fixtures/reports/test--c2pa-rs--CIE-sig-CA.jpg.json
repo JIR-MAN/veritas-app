@@ -1,127 +1,12 @@
 {
  "type": "result",
- "id": "job8",
+ "id": "job11",
  "report": {
   "hasManifest": true,
   "activeLabel": "contentauth:urn:uuid:9b627f23-7597-4d75-8b98-8b810b50a593",
   "store": {
    "active_manifest": "contentauth:urn:uuid:9b627f23-7597-4d75-8b98-8b810b50a593",
    "manifests": {
-    "contentauth:urn:uuid:bc347336-f111-4c34-82da-a970150c5490": {
-     "claim_generator": "make_test_xxxxxx/0.55.0",
-     "claim_generator_info": [
-      {
-       "name": "make_test_images",
-       "version": "0.55.0",
-       "org.cai.c2pa_rs": "0.55.0"
-      }
-     ],
-     "title": "CA.jpg",
-     "format": "image/jpeg",
-     "instance_id": "xmp:iid:9a0b6cfe-f088-46d8-93a8-d10afad64dbf",
-     "thumbnail": {
-      "format": "image/jpeg",
-      "identifier": "self#jumbf=/c2pa/contentauth:urn:uuid:bc347336-f111-4c34-82da-a970150c5490/c2pa.assertions/c2pa.thumbnail.claim.jpeg"
-     },
-     "ingredients": [
-      {
-       "title": "A.jpg",
-       "format": "image/jpeg",
-       "document_id": "xmp.did:813ee422-9736-4cdc-9be6-4e35ed8e41cb",
-       "instance_id": "xmp.iid:813ee422-9736-4cdc-9be6-4e35ed8e41cb",
-       "thumbnail": {
-        "format": "image/jpeg",
-        "identifier": "self#jumbf=/c2pa/contentauth:urn:uuid:bc347336-f111-4c34-82da-a970150c5490/c2pa.assertions/c2pa.thumbnail.ingredient.jpeg"
-       },
-       "relationship": "parentOf",
-       "label": "c2pa.ingredient.v2"
-      }
-     ],
-     "assertions": [
-      {
-       "label": "stds.schema-org.CreativeWork",
-       "data": {
-        "@context": "http://schema.org/",
-        "@type": "CreativeWork",
-        "author": [
-         {
-          "name": "John Doe",
-          "@type": "Person"
-         }
-        ]
-       },
-       "kind": "Json"
-      },
-      {
-       "label": "c2pa.actions.v2",
-       "data": {
-        "actions": [
-         {
-          "action": "c2pa.opened",
-          "parameters": {
-           "ingredients": [
-            {
-             "url": "self#jumbf=c2pa.assertions/c2pa.ingredient.v2",
-             "hash": [
-              162,
-              254,
-              144,
-              204,
-              146,
-              198,
-              91,
-              72,
-              170,
-              186,
-              143,
-              209,
-              255,
-              20,
-              51,
-              149,
-              209,
-              54,
-              67,
-              76,
-              66,
-              121,
-              111,
-              31,
-              156,
-              128,
-              5,
-              83,
-              110,
-              96,
-              7,
-              123
-             ]
-            }
-           ],
-           "org.cai.ingredientIds": [
-            "xmp.iid:813ee422-9736-4cdc-9be6-4e35ed8e41cb"
-           ]
-          }
-         },
-         {
-          "action": "c2pa.color_adjustments",
-          "parameters": {
-           "name": "brightnesscontrast"
-          }
-         }
-        ]
-       }
-      }
-     ],
-     "signature_info": {
-      "alg": "Ps256",
-      "issuer": "C2PA Test Signing Cert",
-      "common_name": "C2PA Signer",
-      "cert_serial_number": "720724073027128164015125666832722375746636448153"
-     },
-     "label": "contentauth:urn:uuid:bc347336-f111-4c34-82da-a970150c5490",
-     "claim_version": 1
-    },
     "contentauth:urn:uuid:9b627f23-7597-4d75-8b98-8b810b50a593": {
      "claim_generator": "make_test_images/0.55.0",
      "claim_generator_info": [
@@ -252,6 +137,121 @@
       "time": "2025-05-30T03:15:13+00:00"
      },
      "label": "contentauth:urn:uuid:9b627f23-7597-4d75-8b98-8b810b50a593",
+     "claim_version": 1
+    },
+    "contentauth:urn:uuid:bc347336-f111-4c34-82da-a970150c5490": {
+     "claim_generator": "make_test_xxxxxx/0.55.0",
+     "claim_generator_info": [
+      {
+       "name": "make_test_images",
+       "version": "0.55.0",
+       "org.cai.c2pa_rs": "0.55.0"
+      }
+     ],
+     "title": "CA.jpg",
+     "format": "image/jpeg",
+     "instance_id": "xmp:iid:9a0b6cfe-f088-46d8-93a8-d10afad64dbf",
+     "thumbnail": {
+      "format": "image/jpeg",
+      "identifier": "self#jumbf=/c2pa/contentauth:urn:uuid:bc347336-f111-4c34-82da-a970150c5490/c2pa.assertions/c2pa.thumbnail.claim.jpeg"
+     },
+     "ingredients": [
+      {
+       "title": "A.jpg",
+       "format": "image/jpeg",
+       "document_id": "xmp.did:813ee422-9736-4cdc-9be6-4e35ed8e41cb",
+       "instance_id": "xmp.iid:813ee422-9736-4cdc-9be6-4e35ed8e41cb",
+       "thumbnail": {
+        "format": "image/jpeg",
+        "identifier": "self#jumbf=/c2pa/contentauth:urn:uuid:bc347336-f111-4c34-82da-a970150c5490/c2pa.assertions/c2pa.thumbnail.ingredient.jpeg"
+       },
+       "relationship": "parentOf",
+       "label": "c2pa.ingredient.v2"
+      }
+     ],
+     "assertions": [
+      {
+       "label": "stds.schema-org.CreativeWork",
+       "data": {
+        "@context": "http://schema.org/",
+        "@type": "CreativeWork",
+        "author": [
+         {
+          "name": "John Doe",
+          "@type": "Person"
+         }
+        ]
+       },
+       "kind": "Json"
+      },
+      {
+       "label": "c2pa.actions.v2",
+       "data": {
+        "actions": [
+         {
+          "action": "c2pa.opened",
+          "parameters": {
+           "ingredients": [
+            {
+             "url": "self#jumbf=c2pa.assertions/c2pa.ingredient.v2",
+             "hash": [
+              162,
+              254,
+              144,
+              204,
+              146,
+              198,
+              91,
+              72,
+              170,
+              186,
+              143,
+              209,
+              255,
+              20,
+              51,
+              149,
+              209,
+              54,
+              67,
+              76,
+              66,
+              121,
+              111,
+              31,
+              156,
+              128,
+              5,
+              83,
+              110,
+              96,
+              7,
+              123
+             ]
+            }
+           ],
+           "org.cai.ingredientIds": [
+            "xmp.iid:813ee422-9736-4cdc-9be6-4e35ed8e41cb"
+           ]
+          }
+         },
+         {
+          "action": "c2pa.color_adjustments",
+          "parameters": {
+           "name": "brightnesscontrast"
+          }
+         }
+        ]
+       }
+      }
+     ],
+     "signature_info": {
+      "alg": "Ps256",
+      "issuer": "C2PA Test Signing Cert",
+      "common_name": "C2PA Signer",
+      "cert_serial_number": "720724073027128164015125666832722375746636448153"
+     },
+     "label": "contentauth:urn:uuid:bc347336-f111-4c34-82da-a970150c5490",
      "claim_version": 1
     }
    },
@@ -421,6 +421,13 @@
     "specVersion": "2.4.0"
    },
    "validation_state": "Valid"
+  },
+  "metadata": {
+   "findings": [],
+   "fields": [],
+   "hasLocation": false,
+   "hasCamera": false,
+   "hasAnyMetadata": false
   },
   "engine": {
    "library": "@contentauth/c2pa-web",

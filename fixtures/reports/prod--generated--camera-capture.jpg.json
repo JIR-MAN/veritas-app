@@ -1,6 +1,6 @@
 {
  "type": "result",
- "id": "job3",
+ "id": "job5",
  "report": {
   "hasManifest": true,
   "activeLabel": "urn:c2pa:dfb4956a-93b8-4849-9d04-8d6b379eab83",
@@ -104,6 +104,18 @@
     "specVersion": "2.4.0"
    },
    "validation_state": "Valid"
+  },
+  "metadata": {
+   "findings": [],
+   "fields": [
+    {
+     "label": "Software",
+     "value": "Adobe Photoshop 24.1 (20221029.m.1946 73a94a1)  (Macintosh)"
+    }
+   ],
+   "hasLocation": false,
+   "hasCamera": false,
+   "hasAnyMetadata": true
   },
   "engine": {
    "library": "@contentauth/c2pa-web",

@@ -1,8 +1,24 @@
 {
  "type": "result",
- "id": "job12",
+ "id": "job15",
  "report": {
   "hasManifest": false,
+  "metadata": {
+   "findings": [],
+   "fields": [
+    {
+     "label": "Software",
+     "value": "Adobe Photoshop 21.1 (Macintosh)"
+    },
+    {
+     "label": "Created with",
+     "value": "Adobe Photoshop CS Windows"
+    }
+   ],
+   "hasLocation": false,
+   "hasCamera": false,
+   "hasAnyMetadata": true
+  },
   "engine": {
    "library": "@contentauth/c2pa-web",
    "libraryVersion": "0.16.1",

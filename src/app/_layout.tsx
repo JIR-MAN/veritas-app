@@ -48,6 +48,10 @@ export default function RootLayout() {
         <Stack.Screen name="evidence/[id]" options={{ title: 'Evidence record' }} />
         <Stack.Screen name="about/checks" options={{ title: 'How checks work' }} />
         <Stack.Screen name="about/privacy" options={{ title: 'Privacy' }} />
+        <Stack.Screen name="inspect/ela" options={{ title: 'Error levels' }} />
+        <Stack.Screen name="inspect/search" options={{ title: 'Search the web' }} />
+        <Stack.Screen name="inspect/detectors" options={{ title: 'AI detection services' }} />
+        <Stack.Screen name="inspect/watermark" options={{ title: 'Invisible watermark' }} />
       </Stack>
     </ThemeProvider>
   );

@@ -14,7 +14,7 @@ let status: Status = 'loading';
 let info: EngineInfo | null = null;
 let initError: string | null = null;
 const waiters: (() => void)[] = [];
-const pending = new Map<string, (r: EngineResponse) => void>();
+const pending = new Map<string, (r: any) => void>();
 const statusListeners = new Set<() => void>();
 let seq = 0;
 
@@ -76,6 +76,17 @@ function waitReady(timeoutMs = 30000) {
 
 /** Sends the file to the on-device engine and resolves with its raw response. Never invents a result. */
 export async function runCredentialCheck(file: PickedFile, mime: string): Promise<EngineResponse> {
+  return sendJob(file, mime, 'verify');
+}
+
+export type ElaResult = { type: 'ela'; id: string; ela: { png: string; width: number; height: number; quality: number; amplify: number } };
+
+/** Error level analysis image, computed on the device. */
+export async function runEla(file: PickedFile, mime: string): Promise<ElaResult | { type: 'error'; id: string; code: string; message: string }> {
+  return sendJob(file, mime, 'ela');
+}
+
+async function sendJob(file: PickedFile, mime: string, op: 'verify' | 'ela'): Promise<any> {
   const id = `job${++seq}`;
   if (file.size > MAX_CHECK_BYTES) return { type: 'error', id, code: 'too_large', message: 'File exceeds on-device limit' };
   await waitReady();
@@ -92,7 +103,7 @@ export async function runCredentialCheck(file: PickedFile, mime: string): Promis
       }
     }, 120000);
   });
-  send(JSON.stringify({ type: 'begin', id, mime, size: file.size }));
+  send(JSON.stringify({ type: 'begin', id, mime, size: file.size, op }));
   // The engine compares received bytes with the declared size and reports any mismatch.
   await forEachChunk(file, (bytes) => {
     send(JSON.stringify({ type: 'chunk', id, b64: toBase64(bytes) }));

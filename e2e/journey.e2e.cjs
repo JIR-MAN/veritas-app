@@ -42,7 +42,7 @@ async function step(name, fn) {
 
     await step('engine starts on device', async () => {
       await page.goto(base + '/check');
-      await page.getByText('On device').waitFor({ timeout: 60000 });
+      await page.getByText('On device').first().waitFor({ timeout: 60000 });
     });
 
     const verdicts = {
@@ -54,18 +54,34 @@ async function step(name, fn) {
     for (const [key, headline] of Object.entries(verdicts)) {
       await step(`sample "${key}" -> ${headline}`, async () => {
         await page.goto(base + '/check');
-        await page.getByText('On device').waitFor({ timeout: 60000 });
+        await page.getByText('On device').first().waitFor({ timeout: 60000 });
         await page.getByTestId(`sample-${key}`).click();
         await page.getByTestId('verdict').waitFor({ timeout: 60000 });
         const text = await page.getByTestId('verdict').innerText();
         assert.ok(text.includes(headline), `verdict was: ${text}`);
-        assert.ok(await page.getByText('Not checked. No independently evaluated detector is connected.').isVisible());
+        assert.ok(await page.getByText('Not checked. Paid detection services are switched off until approved.').isVisible());
       });
     }
 
+    await step('more ways to check: watermark, search and SynthID, error levels', async () => {
+      await page.goto(base + '/check');
+      await page.getByText('On device').first().waitFor({ timeout: 60000 });
+      await page.getByTestId('sample-none').click();
+      await page.getByTestId('verdict').waitFor({ timeout: 60000 });
+      // The TrustMark reader is never downloaded without the user's tap.
+      await page.getByTestId('more-watermark').click();
+      await page.getByTestId('wm-download').waitFor({ timeout: 30000 });
+      await page.goBack();
+      await page.getByTestId('more-search').click();
+      await page.getByText('Google SynthID Detector').waitFor();
+      await page.goBack();
+      await page.getByTestId('more-ela').click();
+      await page.getByLabel('Error level analysis image').waitFor({ timeout: 60000 });
+    });
+
     await step('save tampered sample as evidence in a new case', async () => {
       await page.goto(base + '/check');
-      await page.getByText('On device').waitFor({ timeout: 60000 });
+      await page.getByText('On device').first().waitFor({ timeout: 60000 });
       await page.getByTestId('sample-tampered').click();
       await page.getByTestId('verdict').waitFor({ timeout: 60000 });
       await page.getByTestId('save-evidence').click();
