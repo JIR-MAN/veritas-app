@@ -59,3 +59,15 @@ test('per-client daily limit', async () => {
   expect((await handle(request('sightengine', { ip: '9.9.9.9' }), env, f)).status).toBe(429);
   expect((await handle(request('sightengine', { ip: '8.8.8.8' }), env, f)).status).toBe(200);
 });
+
+test('monthly cap stops requests once the free allowance is used', async () => {
+  const store = new Map<string, string>();
+  const kv = { get: async (k: string) => store.get(k) ?? null, put: async (k: string, v: string) => void store.set(k, v) };
+  const f = jest.fn(() => reply({ status: 'success', type: { ai_generated: 0.5 } })) as unknown as typeof fetch;
+  const e = { ...env, MONTHLY_CAP: '2', PER_CLIENT_DAILY: '10', COUNTERS: kv };
+  expect((await handle(request('sightengine', { ip: '1.0.0.1' }), e, f)).status).toBe(200);
+  expect((await handle(request('sightengine', { ip: '1.0.0.2' }), e, f)).status).toBe(200);
+  const r = await handle(request('sightengine', { ip: '1.0.0.3' }), e, f);
+  expect(r.status).toBe(429);
+  expect((await r.json()).error).toBe('monthly_limit');
+});

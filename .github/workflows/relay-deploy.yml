@@ -1,0 +1,63 @@
+name: Deploy detection relay
+# Puts server/detector-relay on Cloudflare Workers (free plan). Needs these
+# repository secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, and the key
+# of each switched-on provider (REALITY_DEFENDER_API_KEY first).
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      REALITY_DEFENDER_API_KEY: ${{ secrets.REALITY_DEFENDER_API_KEY }}
+      WRANGLER: npx --yes wrangler@4
+    defaults:
+      run:
+        working-directory: server/detector-relay
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check the secrets are set
+        run: |
+          for v in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID REALITY_DEFENDER_API_KEY; do
+            if [ -z "${!v}" ]; then echo "::error::Missing repository secret $v"; exit 1; fi
+          done
+      - name: Counter storage for the monthly cap
+        run: |
+          ID=$($WRANGLER kv namespace list | jq -r '.[] | select(.title | contains("veritas-detector-relay-counters")) | .id' | head -1)
+          if [ -z "$ID" ]; then
+            $WRANGLER kv namespace create veritas-detector-relay-counters
+            ID=$($WRANGLER kv namespace list | jq -r '.[] | select(.title | contains("veritas-detector-relay-counters")) | .id' | head -1)
+          fi
+          test -n "$ID"
+          cat > wrangler.toml <<TOML
+          name = "veritas-detector-relay"
+          main = "relay.ts"
+          compatibility_date = "2026-10-01"
+          workers_dev = true
+
+          [vars]
+          ALLOWED_ORIGINS = "https://jir-man.github.io"
+          DAILY_CAP = "10"
+          PER_CLIENT_DAILY = "5"
+          MONTHLY_CAP = "50"
+
+          [[kv_namespaces]]
+          binding = "COUNTERS"
+          id = "$ID"
+          TOML
+      - name: Deploy
+        run: $WRANGLER deploy | tee deploy.log
+      - name: Store the provider key on Cloudflare (never in the app)
+        run: printf '%s' "$REALITY_DEFENDER_API_KEY" | $WRANGLER secret put REALITY_DEFENDER_API_KEY
+      - name: Health check
+        run: |
+          URL=$(grep -oE 'https://[a-z0-9.-]+\.workers\.dev' deploy.log | head -1)
+          echo "Relay URL: $URL" | tee -a "$GITHUB_STEP_SUMMARY"
+          sleep 5
+          curl -fsS "$URL/health"

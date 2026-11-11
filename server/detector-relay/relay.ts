@@ -10,13 +10,18 @@
  *   ALLOWED_ORIGINS  comma-separated web origins allowed to call (apps send none)
  *   DAILY_CAP        total requests per day across all users (default 100)
  *   PER_CLIENT_DAILY requests per day per client address (default 10)
+ *   MONTHLY_CAP      total requests per calendar month (default 50, the
+ *                    Reality Defender free allowance). Needs the COUNTERS KV
+ *                    binding to be reliable across server instances.
  *
  * NOT YET VERIFIED against the live services: no accounts exist yet. The
  * request and response shapes follow each provider's public documentation and
  * must be checked with a real key before this is switched on.
  */
 
-export type Env = Record<string, string | undefined>;
+/** Minimal Cloudflare KV interface, used for the monthly cap when bound as COUNTERS. */
+export type KV = { get(key: string): Promise<string | null>; put(key: string, value: string, opts?: { expirationTtl?: number }): Promise<void> };
+export type Env = { COUNTERS?: KV } & Record<string, any>;
 export type Opinion = { score: number; model: string };
 type Provider = (file: File, env: Env, f: typeof fetch) => Promise<Opinion>;
 
@@ -89,6 +94,7 @@ export const PROVIDERS: Record<string, Provider> = { sightengine, hive, reality_
 
 /** In-memory daily counters. On multi-instance hosts use the platform's rate limiter as well. */
 const counters = new Map<string, number>();
+const monthCounters = new Map<string, number>();
 let counterDay = '';
 function allow(client: string, env: Env) {
   const day = new Date().toISOString().slice(0, 10);
@@ -105,13 +111,30 @@ function allow(client: string, env: Env) {
   counters.set(client, mine + 1);
   return true;
 }
+/** Monthly cap, stored in KV when available so it holds across instances. */
+async function allowMonth(env: Env) {
+  const cap = Number(env.MONTHLY_CAP ?? 50);
+  const key = `month:${new Date().toISOString().slice(0, 7)}`;
+  if (env.COUNTERS) {
+    const used = Number((await env.COUNTERS.get(key)) ?? 0);
+    if (used >= cap) return false;
+    await env.COUNTERS.put(key, String(used + 1), { expirationTtl: 60 * 60 * 24 * 40 });
+    return true;
+  }
+  const used = monthCounters.get(key) ?? 0;
+  if (used >= cap) return false;
+  monthCounters.set(key, used + 1);
+  return true;
+}
+
 export function resetCounters() {
   counters.clear();
+  monthCounters.clear();
 }
 
 function cors(req: Request, env: Env): Record<string, string> {
   const origin = req.headers.get('origin');
-  const allowed = (env.ALLOWED_ORIGINS ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+  const allowed = String(env.ALLOWED_ORIGINS ?? '').split(',').map((s: string) => s.trim()).filter(Boolean);
   if (!origin || !allowed.includes(origin)) return {};
   return { 'access-control-allow-origin': origin, 'access-control-allow-methods': 'POST, OPTIONS', 'access-control-allow-headers': 'content-type', vary: 'origin' };
 }
@@ -130,7 +153,6 @@ export async function handle(req: Request, env: Env, f: typeof fetch = fetch): P
   const len = Number(req.headers.get('content-length') ?? 0);
   if (len > MAX_BYTES + 64 * 1024) return json(413, { error: 'too_large' });
   const client = req.headers.get('cf-connecting-ip') ?? req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown';
-  if (!allow(client, env)) return json(429, { error: 'daily_limit' });
   let file: File;
   try {
     const form = await req.formData();
@@ -142,6 +164,8 @@ export async function handle(req: Request, env: Env, f: typeof fetch = fetch): P
   }
   if (file.size > MAX_BYTES) return json(413, { error: 'too_large' });
   if (!IMAGE_TYPES.includes(file.type)) return json(415, { error: 'images_only' });
+  if (!allow(client, env)) return json(429, { error: 'daily_limit' });
+  if (!(await allowMonth(env))) return json(429, { error: 'monthly_limit' });
   try {
     return json(200, await provider(file, env, f));
   } catch (e) {
