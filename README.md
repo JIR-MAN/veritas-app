@@ -2,6 +2,8 @@
 
 VERITAS is an app for iPhone, iPad and Android that helps people deal with suspicious media, impersonation, scams and online abuse. It works in four steps: **Check**, **Protect**, **Act** and **Learn**. *VERITAS is a working name until it has been cleared for use.*
 
+> **Try it in a browser:** https://jir-man.github.io/veritas-app/ (web demo, sample files only recommended)
+>
 > **Status:** milestone 1 of the beta, not yet released. See [docs/STATUS.md](docs/STATUS.md) for what works today.
 
 ## What works now (milestone 1)

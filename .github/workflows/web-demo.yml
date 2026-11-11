@@ -1,0 +1,40 @@
+# Republishes the web demo (GitHub Pages, gh-pages branch) after each push to main, once all checks pass.
+# The web demo is a companion; the product is the iOS/Android app.
+name: Web demo
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: web-demo
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+  publish:
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx expo export -p web --output-dir dist-pages
+        env:
+          EXPO_BASE_URL: /${{ github.event.repository.name }}
+      - name: Publish to gh-pages
+        run: |
+          cp dist-pages/index.html dist-pages/404.html
+          touch dist-pages/.nojekyll
+          cd dist-pages
+          git init -q -b gh-pages
+          git add -A
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -qm "Web demo from ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" gh-pages
