@@ -85,7 +85,7 @@ async function step(name, fn) {
       await page.getByTestId('add-note').click();
       await page.getByTestId('note-text').fill('Saw the altered photo shared in a group chat.');
       await page.getByTestId('save-note').click();
-      await page.getByText('Saw the altered photo shared in a group chat.').waitFor();
+      await page.getByText('Saw the altered photo shared in a group chat.').first().waitFor();
     });
 
     await step('export data contains hash, verdict, note and disclaimers', async () => {
