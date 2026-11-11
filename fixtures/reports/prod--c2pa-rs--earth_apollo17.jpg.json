@@ -1,0 +1,18 @@
+{
+ "type": "result",
+ "id": "job12",
+ "report": {
+  "hasManifest": false,
+  "engine": {
+   "library": "@contentauth/c2pa-web",
+   "libraryVersion": "0.16.1",
+   "trustListsFetched": "2026-11-11",
+   "trustLists": [
+    "C2PA Conformance Trust List",
+    "C2PA TSA Trust List",
+    "CAI interim trust list (legacy)"
+   ],
+   "testAnchorsLoaded": false
+  }
+ }
+}

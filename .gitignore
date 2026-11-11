@@ -41,3 +41,12 @@ example
 # generated native folders
 /ios
 /android
+
+# VERITAS: trust lists and public c2pa-rs TEST certificates are intentionally committed
+!assets/trust/*.pem
+!fixtures/certs/*.pem
+# generated engine bundles (rebuilt by `npm run engine:build`, runs on postinstall)
+assets/engine/
+fixtures/engine-test.html
+# local screenshots/scratch
+artifacts/

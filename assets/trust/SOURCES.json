@@ -1,0 +1,11 @@
+{
+  "fetched": "2026-11-11",
+  "files": {
+    "c2pa-trust-list.pem": "https://raw.githubusercontent.com/c2pa-org/conformance-public/main/trust-list/C2PA-TRUST-LIST.pem",
+    "c2pa-tsa-trust-list.pem": "https://raw.githubusercontent.com/c2pa-org/conformance-public/main/trust-list/C2PA-TSA-TRUST-LIST.pem",
+    "cai-interim-anchors.pem": "https://raw.githubusercontent.com/contentauth/verify-site/main/static/trust/anchors.pem",
+    "cai-interim-allowed.pem": "https://raw.githubusercontent.com/contentauth/verify-site/main/static/trust/allowed.pem",
+    "cai-interim-store.cfg": "https://raw.githubusercontent.com/contentauth/verify-site/main/static/trust/store.cfg"
+  },
+  "note": "Refresh with scripts/update-trust-lists.sh. The CAI interim list is legacy; the C2PA Conformance list is the official one."
+}

@@ -1,0 +1,19 @@
+{
+ "type": "result",
+ "id": "job11",
+ "report": {
+  "hasManifest": false,
+  "remoteManifestUrl": "https://cai-manifests.adobe.com/manifests/adobe-urn-uuid-5f37e182-3687-462e-a7fb-573462780391",
+  "engine": {
+   "library": "@contentauth/c2pa-web",
+   "libraryVersion": "0.16.1",
+   "trustListsFetched": "2026-11-11",
+   "trustLists": [
+    "C2PA Conformance Trust List",
+    "C2PA TSA Trust List",
+    "CAI interim trust list (legacy)"
+   ],
+   "testAnchorsLoaded": true
+  }
+ }
+}
