@@ -92,7 +92,7 @@ async function appTest() {
   const base = 'http://localhost:8091';
   try {
     await page.goto(base + '/check');
-    await page.getByText('On device').waitFor({ timeout: 60000 });
+    await page.getByText('On device').first().waitFor({ timeout: 60000 });
     await page.getByTestId('sample-none').click();
     await page.getByTestId('verdict').waitFor({ timeout: 60000 });
     await page.getByTestId('more-watermark').click();
