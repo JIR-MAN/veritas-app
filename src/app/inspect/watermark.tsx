@@ -42,7 +42,7 @@ export default function WatermarkScreen() {
   async function download() {
     const ok = await confirm(
       'Download the watermark reader?',
-      'VERITAS will download Adobe’s free TrustMark reader files from Adobe’s server, once. Your image is not sent anywhere: it is read on this device. Use Wi-Fi if your data is limited.',
+      'VERITAS will download Adobe’s free TrustMark reader files from Adobe’s server, once (about 95 MB). Your image is not sent anywhere: it is read on this device. Use Wi-Fi if your data is limited.',
       'Download',
       false,
     );
@@ -85,7 +85,7 @@ export default function WatermarkScreen() {
       {phase.k === 'need_models' || phase.k === 'download_failed' ? (
         <Group title="One-time download" footer="The reader files come from Adobe (MIT licence). After this, checks work offline.">
           <View style={{ padding: space.lg, gap: space.md }}>
-            <Text variant="callout">To read TrustMark watermarks, VERITAS first needs Adobe’s free reader files. Only those files are downloaded. Your image never leaves this device.</Text>
+            <Text variant="callout">To read TrustMark watermarks, VERITAS first needs Adobe’s free reader files (about 95 MB, so Wi-Fi is best). Only those files are downloaded. Your image never leaves this device.</Text>
             {phase.k === 'download_failed' ? (
               <Text variant="callout" color="critical">
                 The download didn’t finish: {phase.message}
